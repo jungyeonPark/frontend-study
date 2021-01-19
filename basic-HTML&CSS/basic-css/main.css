@@ -1,0 +1,52 @@
+body {
+    /*
+        각 브라우저마다 가지는 여백의 기본값을 지우고 시작
+    */
+    margin: 0;
+    padding: 0;
+}
+.header {
+    /*
+        기본값
+        width: auto;  <- width: 100%와 같은 의미
+        height: auto; <- height는 내부 요소들이 차지하는 크기만큼 자동으로 증가한다는 의미
+    */
+    background: white;
+    border-bottom: 1px solid lightgray;
+}
+.container {
+    width: 980px;
+    margin: auto; /* width의 양쪽에 여백을 줘서 요소를 가운데에 위치하게 함 */
+}
+.container-left {
+    /* 패딩을 상위 요소에 넣어도 결과는 같지만 패딩 효과를 봐야 하는 가장 하위 요소에 넣는게 좋다 */
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+.logo {
+    float: left;
+    margin-right: 5px;
+}
+/* logo의 하위 img 태그에만 적용 */
+.logo img {
+    display: block;
+}
+.menu {
+    float: left;
+}
+.menu-item {
+    float: left;
+    padding: 8px 10px;
+/*
+    이거랑 같은 의미
+    padding-top: 8px;
+    padding-bottom: 8px;
+    padding-left: 10px;
+    padding-right: 10px;
+*/
+}
+.clearfix::after {
+    content:"";
+    display:block;
+    clear:both;
+}
