@@ -77,7 +77,7 @@
    - `E`의 **다음** 형제 요소 `F` **모두** 선택
    - `E ~ F`로 사용
 
-## 가상클래스 선택자(Pseudo Classes Selectors)
+## 가상클래스 선택자(Pseudo-Classes Selectors)
 
 - HOVER
   - `E`에 마우스(포인터)가 올라가 있는 동안에만 `E` 선택
@@ -126,7 +126,7 @@
   - `S`를 제외한 `E`선택
   - `E:not(S)`로 사용
 
-## 가상요소 선택자
+## 가상요소 선택자(Pseudo-Elements Selectors)
 
 - 가상 요소는 CSS로 HTML에 내용을 삽입하는 것
 - 가상 요소는 가상 클래스와 다르게 `::`(콜론 2개) 사용
