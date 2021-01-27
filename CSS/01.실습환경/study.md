@@ -1,7 +1,7 @@
 # CSS Reset
 
 - 브라우저마다 출력되는 스타일이 다름
-- html의 헤더에 내가 연결한 css파일 **위에** 다음 코드를 작성
+- html의 헤드에 내가 연결한 css파일 **위에** 다음 코드를 작성
   ```html
   <link
     rel="stylesheet"
