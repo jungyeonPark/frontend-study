@@ -653,3 +653,254 @@ const onDecrease = () => {
 
   - input의 상태를 관리할 때는 input태그의 `value` 값도 설정해주는 것이 중요
   - 그렇게 해야 상태가 바뀌었을 때 input의 내용도 업데이트됨!
+
+# 9. 여러개의 input 상태 관리하기
+
+이번에는 input이 여러개일 때 어떻게 관리해야 하는지 알아보자
+
+8번에서 만들었던 InputSample에서 새로운 input을 추가하고 코드를 수정
+
+- input의 개수가 여러개가 됐을 때는, 단순히 useState를 여러번 사용하고 onChange도 여러개 만들어서 구현할 수는 있지만 좋은 방법은 아님
+- 좋은 방법은 input에 `name`을 설정하고 이벤트가 발생했을 때 이 값을 참조하는 것
+- 그리고 `useState`에서는 문자열이 아닌 **객체** 의 상태를 관리해줘야 함
+
+- InputSample.js
+
+  ```js
+  import React, { useState } from "react";
+
+  function InputSample() {
+    const [inputs, setInputs] = useState({
+      name: "",
+      nickname: "",
+    });
+
+    const { name, nickname } = inputs; // 비구조화 할당을 통해 값 추출
+
+    const onChange = (e) => {
+      const { value, name } = e.target; // 우선 e.target 에서 name 과 value 를 추출
+      setInputs({
+        ...inputs, // 기존의 input 객체를 복사한 뒤
+        [name]: value, // name 키를 가진 값을 value 로 설정
+      });
+    };
+
+    const onReset = () => {
+      setInputs({
+        name: "",
+        nickname: "",
+      });
+    };
+
+    return (
+      <div>
+        <input
+          name="name"
+          placeholder="이름"
+          onChange={onChange}
+          value={name}
+        />
+        <input
+          name="nickname"
+          placeholder="닉네임"
+          onChange={onChange}
+          value={nickname}
+        />
+        <button onClick={onReset}>초기화</button>
+        <div>
+          <b>값: </b>
+          {name} ({nickname})
+        </div>
+      </div>
+    );
+  }
+
+  export default InputSample;
+  ```
+
+- 리액트 상태에서 객체를 수정해야 할 때는 다음과 같이 직접 수정하면 안됨
+  ```js
+  inputs[name] = value;
+  ```
+- 대신 새로운 객체를 만들어 기존 객체를 복사하고 나서 변화된 값을 덮어씌워 이를 상태로 사용해야 함
+  ```js
+  setInputs({
+    ...inputs,
+    [name]: value,
+  });
+  ```
+  - 여기서 사용한 `...`문법은 spread문법으로 기존 객체를 복사해줌
+  - 이러한 작업을 "불변성을 지킨다"라고 부름
+  - 불변성을 지켜주어야 리액트 컴포넌트에서 상태가 업데이트 됐음을 감지 가능하고 이에 따라 필요한 리렌더링이 진행됨
+  - 만약 기존 상태를 직접 수정하게 되면, 값을 바꿔도 리렌더링이 되지 않음
+- 리액트에서는 불변성을 지켜주어야만 컴포넌트 업데이트 성능 최적화를 제대로 할 수 있음(나중에 자세히 알아볼 것임)
+
+# 10. useRef로 특정 DOM 선택
+
+JavaScript를 사용할 때, 우리가 특정 DOM을 선택해야 하는 상황에 `getElementById`, `querySelector`같은 DOM Selector함수를 사용해서 DOM을 선택함
+
+리액트를 사용하는 프로젝트에서도 가끔 DOM을 직접 선택해야 하는 상황이 발생함
+
+- 특정 엘리먼트의 크기를 가져올 때, 스크롤바 위치를 가져오거나 설정할 때, 포커스를 설정할 때 등
+- 이럴 땐, 리액트에서 `ref`라는 것을 사용함
+- 함수형 컴포넌트에서 `ref`를 사용할 때는 `useRef`라는 Hook함수를 사용함
+- 클래스형 컴포넌트에서는 콜백 함수나 `React.createRef`라는 함수를 사용함(나중에 클래스 컴포넌트를 배울 때 다룸)
+- 8번과 9번에서 만든 InputSample 컴포넌트에서는 초기화 버튼을 누르면 포커스가 초기화 버튼에 그대로 남아있음
+- 초기화 버튼을 클릭했을 때 이름 input에 포커스가 잡히도록 `useRef`를 사용하여 구현해보자
+- InputSample.js
+
+  ```js
+  import React, { useState, useRef } from "react";
+
+  function InputSample() {
+    const [inputs, setInputs] = useState({
+      name: "",
+      nickname: "",
+    });
+    const nameInput = useRef();
+
+    const { name, nickname } = inputs; // 비구조화 할당을 통해 값 추출
+
+    const onChange = (e) => {
+      const { value, name } = e.target; // 우선 e.target 에서 name 과 value 를 추출
+      setInputs({
+        ...inputs, // 기존의 input 객체를 복사한 뒤
+        [name]: value, // name 키를 가진 값을 value 로 설정
+      });
+    };
+
+    const onReset = () => {
+      setInputs({
+        name: "",
+        nickname: "",
+      });
+      nameInput.current.focus();
+    };
+
+    return (
+      <div>
+        <input
+          name="name"
+          placeholder="이름"
+          onChange={onChange}
+          value={name}
+          ref={nameInput}
+        />
+        <input
+          name="nickname"
+          placeholder="닉네임"
+          onChange={onChange}
+          value={nickname}
+        />
+        <button onClick={onReset}>초기화</button>
+        <div>
+          <b>값: </b>
+          {name} ({nickname})
+        </div>
+      </div>
+    );
+  }
+
+  export default InputSample;
+  ```
+
+  - `useRef()`를 사용하여 Ref객체를 만듦
+  - 이 객체를 우리가 선택하고 싶은 DOM에 `ref`값으로 설정해주어야 함
+    ```js
+    ref = { nameInput };
+    ```
+  - 그러면 Ref객체의 `.current`값은 우리가 원하는 DOM을 가르키게 됨
+  - `onReset`함수에서 input에 포커스를 하는 `focus()` DOM API를 호출
+
+# 11. 배열 렌더링하기
+
+리액트에서 배열을 렌더링하는 방법을 알아보자
+
+아래 배열이 있다고 가정하자
+
+```js
+const users = [
+  {
+    id: 1,
+    username: "velopert",
+    email: "public.velopert@gmail.com",
+  },
+  {
+    id: 2,
+    username: "tester",
+    email: "tester@example.com",
+  },
+  {
+    id: 3,
+    username: "liz",
+    email: "liz@example.com",
+  },
+];
+```
+
+위 배열의 내용을 컴포넌트로 렌더링하려면 어떻게 해야 할까?
+
+- 배열 원소가 적으니 각각 태그를 만들어 렌더링해도 되지만 배열 원소가 많거나 배열이 자주 업데이트된다면 매우 비효율적임
+- 컴포넌트를 재사용할 수 있도록 새로 만들면 효율적
+  - 한 파일에 여러개의 컴포넌트 선언 가능!
+- 자바스크립트 배열 내장함수 `map()`을 사용
+  - 리액트에서 동적인 배열을 렌더링해야 할 때 이 함수를 사용하여 일반 데이터 배열을 리액트 엘리먼트로 이루어진 배열로 변환
+- UserList.js
+
+  ```js
+  import React from "react";
+
+  function User({ user }) {
+    return (
+      <div>
+        <b>{user.username}</b> <span>({user.email})</span>
+      </div>
+    );
+  }
+
+  function UserList() {
+    const users = [
+      {
+        id: 1,
+        username: "velopert",
+        email: "public.velopert@gmail.com",
+      },
+      {
+        id: 2,
+        username: "tester",
+        email: "tester@example.com",
+      },
+      {
+        id: 3,
+        username: "liz",
+        email: "liz@example.com",
+      },
+    ];
+
+    return (
+      <div>
+        {users.map((user) => (
+          <User user={user} key={user.id} />
+        ))}
+      </div>
+    );
+  }
+
+  export default UserList;
+  ```
+
+  - 리액트에서 배열을 렌더링할 때는 `key`라는 `props`를 설정해야 함
+    - 설정해주지 않으면 콘솔창에 경고메세지가 뜸
+  - `key`값은 각 원소마다 가지고 있는 고유값으로 설정해야 함
+    - 지금의 경우엔 `id`가 고유값
+  - 만약 배열 안의 원소가 가지는 고유한 값이 없다면 `map()`함수를 사용할 때 설정하는 콜백함수의 두번째 파라미터 `index`를 key로 사용하면 되지만 비효율적
+    - key설정을 하지 않으면 자동으로 index값을 key로 사용
+
+## key의 존재유무에 따른 업데이트 방식
+
+- key가 없을 때
+  - 중간에 새 태그를 삽입하는 경우 리렌더링을 할 때 원래 삽입할 인덱스에 있던 값이 삽입할 값으로 바뀌고 그 뒤로 한칸씩 바뀌면서 밀리고 맨 마지막 인덱스의 값이 새로 삽입됨
+  - 맨 앞의 태그를 제거하는 경우 리렌더링을 할 때 뒤에 있던 인덱스가 한칸씩 앞으로 당겨지면서 바뀌고 맨 마지막 태그가 제거됨
+- key가 있을 때
+  - 수정되지 않는 기존의 값은 그대로 두고 원하는 곳에 내용을 삽입하거나 삭제함
+  - key가 없을 때보다 훨씬 효율적
