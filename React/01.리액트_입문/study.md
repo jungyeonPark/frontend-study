@@ -904,3 +904,63 @@ const users = [
 - key가 있을 때
   - 수정되지 않는 기존의 값은 그대로 두고 원하는 곳에 내용을 삽입하거나 삭제함
   - key가 없을 때보다 훨씬 효율적
+
+# 12. useRef로 컴포넌트 안의 변수 만들기
+
+컴포넌트에서 특정 DOM을 선택해야 할 때, `ref`를 사용해야 한다고 배웠었고, 함수형 컴포넌트에서 이를 설정할 때 `useRef`를 사용한다고 배웠음.
+
+`useRef` Hook은 DOM을 선택하는 용도 외에도, 다른 용도가 한가지 더 있음.
+
+- 컴포넌트 안에서 조회 및 수정할 수 있는 변수를 관리하는 것!!
+- 원래 let으로 변수를 정의하면 값이 바뀔 때마다 컴포넌트가 리렌더링됨
+- 하지만 `useRef`로 관리하는 변수는 값이 바뀌어도 컴포넌트가 리렌더링되지 않음
+- `useState`는 상태를 바꾸는 함수를 호출하고 나서 그 다음 렌더링 이후로 업데이트 된 상태를 조회할 수 있음
+- `useRef`는 변수 설정 후 바로 조회 가능!
+- `useRef`로 다음과 같은 값을 관리 가능
+  - `setTimeout`, `setInterval`을 통해서 만들어진 `id`
+  - 외부 라이브러리를 사용하여 생성된 인스턴스
+  - scroll 위치
+- 이제 App 컴포넌트에서 `useRef`를 사용하여 변수를 관리해보자
+
+  - 앞으로 배열에 추가할 항목에서 사용할 고유 id를 관리하는 용도
+  - 11챕터에서 사용했던 배열을 App컴포넌트에서 props로 UserList컴포넌트에 전달해 줌
+  - App.js
+
+    ```js
+    import React, { useRef } from "react";
+    import UserList from "./UserList";
+
+    function App() {
+      const users = [
+        {
+          id: 1,
+          username: "velopert",
+          email: "public.velopert@gmail.com",
+        },
+        {
+          id: 2,
+          username: "tester",
+          email: "tester@example.com",
+        },
+        {
+          id: 3,
+          username: "liz",
+          email: "liz@example.com",
+        },
+      ];
+
+      const nextId = useRef(4);
+      const onCreate = () => {
+        // 나중에 구현 할 배열에 항목 추가하는 로직
+        // ...
+
+        nextId.current += 1;
+      };
+      return <UserList users={users} />;
+    }
+
+    export default App;
+    ```
+
+    - `useRef()`를 사용할 때 파라미터를 넣어주면, 이 값이 `.current`값의 기본값이 됨
+    - 이 값을 수정할 때는 `.current`값을 수정하면 되고 조회할 때도 `.current`를 조회하면 됨
